@@ -1,26 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Test Doudou</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doudou Alert</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
+        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; }
+        button { background-color: #007bff; color: white; border: none; font-weight: bold; cursor: pointer; }
+        #debug { margin-top: 20px; padding: 10px; border-radius: 8px; background: #f8f9fa; border: 1px solid #dee2e6; }
+    </style>
 </head>
 <body>
 
-    <h1>Test de connexion</h1>
+    <h2>Doudou Alert 🧸</h2>
     <input type="text" id="nomDoudou" placeholder="Nom du doudou">
     <button id="monBouton">Enregistrer</button>
-    <div id="debug" style="margin-top:20px; color:blue;">En attente...</div>
+    <div id="debug">En attente...</div>
 
     <script>
-        // 1. Déclaration directe
-        const debug = document.getElementById('debug');
-        debug.innerText = "Script chargé !";
+        const supabaseUrl = 'https://cbhudpshlbbizozkmhtg.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiaHVkcHNobGJiaXpvemttaHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MzE4OTEsImV4cCI6MjA5NTEwNzg5MX0.qDZw53ec6Ax2sDDWE9L3uJshqtZRBrD9C8FaAvBzvyk'; // N'oublie pas de mettre ta clé !
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // 2. Ecouteur d'événement au lieu de onclick (c'est plus robuste)
-        document.getElementById('monBouton').addEventListener('click', function() {
-            debug.innerText = "Bouton cliqué, fonction lancée !";
-            console.log("Le bouton a bien été cliqué");
-            alert("Ça marche !");
+        const debug = document.getElementById('debug');
+        
+        document.getElementById('monBouton').addEventListener('click', async function() {
+            const nom = document.getElementById('nomDoudou').value;
+            if(!nom) { debug.innerText = "Saisis un nom !"; return; }
+            
+            debug.innerText = "Envoi en cours...";
+
+            try {
+                const { data, error } = await supabase
+                    .from('Doudous')
+                    .insert([{ nom_doudou: nom, Statut: 'A la maison' }]);
+
+                if (error) {
+                    debug.innerText = "Erreur : " + error.message;
+                } else {
+                    debug.innerText = "Succès ! " + nom + " est ajouté.";
+                    document.getElementById('nomDoudou').value = '';
+                }
+            } catch (err) {
+                debug.innerText = "Erreur : " + err.message;
+            }
         });
     </script>
 </body>
