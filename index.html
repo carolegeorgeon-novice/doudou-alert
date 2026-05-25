@@ -20,33 +20,18 @@
     <div id="debug">En attente...</div>
 
     <script>
-        const supabaseUrl = 'https://cbhudpshlbbizozkmhtg.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiaHVkcHNobGJiaXpvemttaHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MzE4OTEsImV4cCI6MjA5NTEwNzg5MX0.qDZw53ec6Ax2sDDWE9L3uJshqtZRBrD9C8FaAvBzvyk'; // N'oublie pas de mettre ta clé !
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-        const debug = document.getElementById('debug');
+    const debug = document.getElementById('debug');
+    
+    document.getElementById('monBouton').addEventListener('click', function() {
+        debug.innerText = "Vérification...";
         
-        document.getElementById('monBouton').addEventListener('click', async function() {
-            const nom = document.getElementById('nomDoudou').value;
-            if(!nom) { debug.innerText = "Saisis un nom !"; return; }
-            
-            debug.innerText = "Envoi en cours...";
-
-            try {
-                const { data, error } = await supabase
-                    .from('Doudous')
-                    .insert([{ nom_doudou: nom, Statut: 'A la maison' }]);
-
-                if (error) {
-                    debug.innerText = "Erreur : " + error.message;
-                } else {
-                    debug.innerText = "Succès ! " + nom + " est ajouté.";
-                    document.getElementById('nomDoudou').value = '';
-                }
-            } catch (err) {
-                debug.innerText = "Erreur : " + err.message;
-            }
-        });
-    </script>
+        // Test si 'supabase' existe dans le navigateur
+        if (typeof supabase !== 'undefined') {
+            debug.innerText = "La bibliothèque Supabase est bien chargée !";
+        } else {
+            debug.innerText = "ERREUR : Supabase n'est pas trouvé dans la page.";
+        }
+    });
+</script>
 </body>
 </html>
