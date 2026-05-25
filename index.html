@@ -1,116 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>Doudou Alert</title>
+    <title>Test Doudou</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        body { 
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
-            /* Fond de page rose très clair du logo */
-            background-color: #f7ede8; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card { 
-            /* Carte vieux rose clair (couleur du lapin) */
-            background: #f7d5c9; 
-            padding: 40px; 
-            border-radius: 25px; 
-            box-shadow: 0 10px 25px rgba(184, 115, 115, 0.1); 
-            text-align: center; 
-            width: 320px; 
-            /* Bordure fine vieux rose du logo */
-            border: 2px solid #b87373;
-        }
-        h1 { 
-            /* Titre vieux rose foncé du logo */
-            color: #b87373; 
-            margin-bottom: 30px;
-            font-size: 24px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        input { 
-            padding: 12px; 
-            width: 85%; 
-            margin-bottom: 20px; 
-            border: 2px solid #b87373; 
-            border-radius: 12px; 
-            background-color: #f7ede8;
-            color: #b87373;
-            font-size: 16px;
-        }
-        input::placeholder {
-            color: #d1a7a7;
-        }
-        button { 
-            padding: 12px 25px; 
-            /* Bouton vieux rose foncé du logo */
-            background-color: #b87373; 
-            border: none; 
-            color: #f7ede8; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: background-color 0.3s;
-        }
-        button:hover { 
-            background-color: #a06363; 
-        }
-    </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>🧸 Doudou Alert</h1>
-        <input type="text" id="nomDoudou" placeholder="Nom du doudou">
-        <button onclick="envoyerVersSupabase()">Enregistrer</button>
-<p id="messageErreur" style="color: red;"></p>
-    </div>
-    <div id="debug" style="margin-top: 20px; padding: 10px; border: 1px solid black;">
-    Console de test : En attente...
-</div>
-<script>
-    // 1. Initialisation (Remplace TA_CLE_API_ANON_ICI)
-    const supabaseUrl = 'https://cbhudpshlbbizozkmhtg.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiaHVkcHNobGJiaXpvemttaHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MzE4OTEsImV4cCI6MjA5NTEwNzg5MX0.qDZw53ec6Ax2sDDWE9L3uJshqtZRBrD9C8FaAvBzvyk';
-    
-    // On utilise la bibliothèque chargée en haut
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    <h1>Test de connexion</h1>
+    <input type="text" id="nomDoudou" placeholder="Nom du doudou">
+    <button id="monBouton">Enregistrer</button>
+    <div id="debug" style="margin-top:20px; color:blue;">En attente...</div>
 
-async function envoyerVersSupabase() {
-    const debug = document.getElementById('debug');
-    debug.innerText = "Clic détecté !"; // Si ce message s'affiche, c'est que le bouton marche.
+    <script>
+        // 1. Déclaration directe
+        const debug = document.getElementById('debug');
+        debug.innerText = "Script chargé !";
 
-    const nom = document.getElementById('nomDoudou').value;
-    
-    if (!nom) {
-        debug.innerText = "Erreur : Le champ est vide !";
-        return;
-    }
-
-    try {
-        debug.innerText = "Envoi à Supabase...";
-        const { data, error } = await supabase
-            .from('Doudous')
-            .insert([{ nom_doudou: nom, Statut: 'A la maison' }]);
-        
-        if (error) {
-            debug.innerText = "Erreur Supabase : " + error.message;
-        } else {
-            debug.innerText = "Succès !";
-        }
-    } catch (err) {
-        debug.innerText = "Erreur technique : " + err.message;
-    }
-}
-</script>
+        // 2. Ecouteur d'événement au lieu de onclick (c'est plus robuste)
+        document.getElementById('monBouton').addEventListener('click', function() {
+            debug.innerText = "Bouton cliqué, fonction lancée !";
+            console.log("Le bouton a bien été cliqué");
+            alert("Ça marche !");
+        });
+    </script>
 </body>
 </html>
