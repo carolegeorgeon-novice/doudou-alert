@@ -74,6 +74,9 @@
         <button onclick="envoyerVersSupabase()">Enregistrer</button>
 <p id="messageErreur" style="color: red;"></p>
     </div>
+    <div id="debug" style="margin-top: 20px; padding: 10px; border: 1px solid black;">
+    Console de test : En attente...
+</div>
 <script>
     // 1. Initialisation (Remplace TA_CLE_API_ANON_ICI)
     const supabaseUrl = 'https://cbhudpshlbbizozkmhtg.supabase.co';
@@ -83,25 +86,29 @@
     const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 async function envoyerVersSupabase() {
-    const messageDiv = document.getElementById('messageErreur');
-    messageDiv.innerText = "Connexion en cours..."; // Pour voir si ça réagit
+    const debug = document.getElementById('debug');
+    debug.innerText = "Clic détecté !"; // Si ce message s'affiche, c'est que le bouton marche.
 
     const nom = document.getElementById('nomDoudou').value;
+    
+    if (!nom) {
+        debug.innerText = "Erreur : Le champ est vide !";
+        return;
+    }
 
     try {
+        debug.innerText = "Envoi à Supabase...";
         const { data, error } = await supabase
             .from('Doudous')
             .insert([{ nom_doudou: nom, Statut: 'A la maison' }]);
-
+        
         if (error) {
-            messageDiv.innerText = "Erreur Supabase : " + error.message;
+            debug.innerText = "Erreur Supabase : " + error.message;
         } else {
-            messageDiv.style.color = "green";
-            messageDiv.innerText = "Succès ! " + nom + " est enregistré.";
-            document.getElementById('nomDoudou').value = '';
+            debug.innerText = "Succès !";
         }
     } catch (err) {
-        messageDiv.innerText = "Erreur technique : " + err.message;
+        debug.innerText = "Erreur technique : " + err.message;
     }
 }
 </script>
