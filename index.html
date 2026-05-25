@@ -21,15 +21,24 @@
 
     <script>
     const debug = document.getElementById('debug');
-    
-    document.getElementById('monBouton').addEventListener('click', function() {
-        debug.innerText = "Vérification...";
-        
-        // Test si 'supabase' existe dans le navigateur
-        if (typeof supabase !== 'undefined') {
-            debug.innerText = "La bibliothèque Supabase est bien chargée !";
-        } else {
-            debug.innerText = "ERREUR : Supabase n'est pas trouvé dans la page.";
+    const supabase = supabase.createClient('https://cbhudpshlbbizozkmhtg.supabase.co', 'TA_CLE_API_ANON_ICI');
+
+    document.getElementById('monBouton').addEventListener('click', async function() {
+        debug.innerText = "Envoi en cours...";
+        const nom = document.getElementById('nomDoudou').value;
+
+        try {
+            const { data, error } = await supabase
+                .from('Doudous')
+                .insert([{ nom_doudou: nom, Statut: 'A la maison' }]);
+
+            if (error) {
+                debug.innerText = "Erreur : " + error.message;
+            } else {
+                debug.innerText = "Succès !";
+            }
+        } catch (err) {
+            debug.innerText = "Crash : " + err.message;
         }
     });
 </script>
