@@ -4,43 +4,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doudou Alert</title>
+    <!-- Chargement de la bibliothèque Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Extraction de createClient depuis l'objet global supabase
+        const { createClient } = supabase;
+    </script>
     <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 400px; margin: auto; }
-        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; }
-        button { background-color: #b87373; color: white; border: none; font-weight: bold; cursor: pointer; }
-        #debug { margin-top: 20px; padding: 10px; border-radius: 8px; background: #f8f9fa; border: 1px solid #dee2e6; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #fff0f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+        }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 350px;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #ffb6c1;
+            border-radius: 10px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ff1493;
+        }
+        #debug {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #555;
+            text-align: center;
+        }
+        #listeDoudous {
+            list-style: none;
+            padding: 0;
+        }
+        #listeDoudous li {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
     </style>
 </head>
 <body>
 
-    <h2>Doudou Alert 🧸</h2>
-    <input type="text" id="nomDoudou" placeholder="Nom du doudou">
-    <button id="monBouton">Enregistrer</button>
-    <div id="debug">En attente...</div>
+    <div class="card">
+        <h2>Doudou Alert 🧸</h2>
+        <input type="text" id="nomDoudou" placeholder="Nom du doudou">
+        <button id="monBouton">Enregistrer</button>
+        <div id="debug">En attente...</div>
+    </div>
+
+    <div class="card">
+        <h2>Liste des Doudous</h2>
+        <ul id="listeDoudous"></ul>
+    </div>
 
     <script>
-    const debug = document.getElementById('debug');
-    const supabase = supabase.createClient('https://cbhudpshlbbizozkmhtg.supabase.co', 'TA_CLE_API_ANON_ICI');
+        // Initialisation Supabase
+        const supabaseUrl = 'https://cbhudpshlbbizozkmhtg.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiaHVkcHNobGJiaXpvemttaHRnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1MzE4OTEsImV4cCI6MjA5NTEwNzg5MX0.qDZw53ec6Ax2sDDWE9L3uJshqtZRBrD9C8FaAvBzvyk'; // Remplace par ta clé publique Supabase
+        const supabase = createClient(supabaseUrl, supabaseKey);
 
-    document.getElementById('monBouton').addEventListener('click', async function() {
-        debug.innerText = "Envoi en cours...";
-        const nom = document.getElementById('nomDoudou').value;
+        // Éléments DOM
+        const debug = document.getElementById('debug');
+        const listeDoudous = document.getElementById('listeDoudous');
+        const inputNomDoudou = document.getElementById('nomDoudou');
 
-        try {
+        // Fonction pour afficher la liste des doudous
+        async function afficherDoudous() {
+            debug.innerText = "Chargement des doudous...";
             const { data, error } = await supabase
                 .from('Doudous')
-                .insert([{ nom_doudou: nom, Statut: 'A la maison' }]);
+                .select('*');
 
             if (error) {
                 debug.innerText = "Erreur : " + error.message;
-            } else {
-                debug.innerText = "Succès !";
+                console.error(error);
+                return;
             }
-        } catch (err) {
-            debug.innerText = "Crash : " + err.message;
+
+            if (data.length === 0) {
+                listeDoudous.innerHTML = "<li>Aucun doudou enregistré.</li>";
+            } else {
+                listeDoudous.innerHTML = data.map(doudou =>
+                    `<li>${doudou.nom_doudou} (${doudou.Statut})</li>`
+                ).join('');
+            }
+            debug.innerText = "Doudous chargés.";
         }
-    });
-</script>
+
+        // Enregistrer un nouveau doudou
+        document.getElementById('monBouton').addEventListener('click', async function() {
+            const nom = inputNomDoudou.value.trim();
+
+            if (!nom) {
+                debug.innerText = "Merci de donner un nom au doudou !";
+                return;
+            }
+
+            debug.innerText = "Envoi en cours...";
+            inputNomDoudou.disabled = true;
+
+            try {
+                const { error } = await supabase
+                    .from('Doudous')
+                    .insert([{ nom_doudou: nom, Statut: 'À la maison' }]);
+
+                if (error) {
+                    debug.innerText = "Erreur : " + error.message;
+                    console.error(error);
+                } else {
+                    debug.innerText = "Succès ! Doudou ajouté.";
+                    inputNomDoudou.value = '';
+                    afficherDoudous(); // Rafraîchir la liste
+                }
+            } catch (err) {
+                debug.innerText = "Erreur technique : " + err.message;
+                console.error(err);
+            } finally {
+                inputNomDoudou.disabled = false;
+            }
+        });
+
+        // Afficher la liste au chargement de la page
+        afficherDoudous();
+    </script>
 </body>
 </html>
